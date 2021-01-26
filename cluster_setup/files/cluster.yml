@@ -1,8 +1,5 @@
 # If you intened to deploy Kubernetes in an air-gapped environment,
 # please consult the documentation on how to configure custom RKE images.
-
-#########----- node -----#########
-
 nodes:
 - address: ${control-plane}
   port: "22"
@@ -50,104 +47,94 @@ nodes:
   labels: 
     worker: one
   taints: []
-
-#########----- k8s services -----#########
-
-kubernetes_version: v1.19.3-rancher1
-cluster_name: "masterclass"
 services:
   etcd:
     image: ""
-    backup_config:
-      enabled: false
-      interval_hours: 12
-      retention: 6
-      safe_timestamp: false
-    creation: 12h
-    extra_args:
-      election-timeout: '5000'
-      heartbeat-interval: '500'
-    gid: 52034
-    uid: 52034
-    retention: 72h
-    snapshot: false
     extra_binds: []
     extra_env: []
+    win_extra_args: {}
+    win_extra_binds: []
+    win_extra_env: []
     external_urls: []
-    ca_cert: ""   #used for external etcd configurations
-    cert: ""      #used for external etcd configurations
-    key: ""       #used for external etcd configurations
-    path: ""      #used for external etcd configurations
+    ca_cert: ""
+    cert: ""
+    key: ""
+    path: ""
+    uid: 0
+    gid: 0
+    snapshot: null
+    retention: ""
+    creation: ""
+    backup_config: null
   kube-api:
     image: ""
-    service_cluster_ip_range: 10.43.0.0/16
-    service_node_port_range: 30000-32767 
-    pod_security_policy: false #enable psp
-    always_pull_images: false #false to avoid dependency
-    secrets_encryption_config:
-      enabled: true
-    audit_log: # set audit policy
-      enabled: true
-      configuration:
-        max_age: 6
-        max_backup: 6
-        max_size: 110
-        path: /var/log/kube-audit/audit-log.json
-        format: json
-        policy:
-          apiVersion: audit.k8s.io/v1
-          kind: Policy
-          rules:
-            # Log "pods/log", "pods/status" at Metadata level
-            - level: Metadata
-              resources:
-              - group: ""
-                resources: ["pods/log", "pods/status"]
-    # find more resources -> https://kubernetes.io/docs/tasks/debug-application-cluster/audit/#audit-policy
-    enable-admission-plugins: "ServiceAccount,NamespaceLifecycle,LimitRanger,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds,AlwaysPullImages,DenyEscalatingExec,NodeRestriction,EventRateLimit,PodSecurityPolicy"
-    event_rate_limit:
-      enabled: true
     extra_args: {}
     extra_binds: []
     extra_env: []
+    win_extra_args: {}
+    win_extra_binds: []
+    win_extra_env: []
+    service_cluster_ip_range: 10.43.0.0/16
+    service_node_port_range: ""
+    pod_security_policy: false
+    always_pull_images: false
+    secrets_encryption_config: null
+    audit_log: null
+    admission_configuration: null
+    event_rate_limit: null
   kube-controller:
     image: ""
-    extra_args:
-      feature-gates: "RotateKubeletServerCertificate=true" #rotate cluster certificates
-      address: 127.0.0.1
-      profiling: 'false'
-      terminated-pod-gc-threshold: '1000'
-    cluster_cidr: 10.42.0.0/16
-    service_cluster_ip_range: 10.43.0.0/16
+    extra_args: {}
     extra_binds: []
     extra_env: []
+    win_extra_args: {}
+    win_extra_binds: []
+    win_extra_env: []
+    cluster_cidr: 10.42.0.0/16
+    service_cluster_ip_range: 10.43.0.0/16
   scheduler:
     image: ""
     extra_args: {}
     extra_binds: []
     extra_env: []
+    win_extra_args: {}
+    win_extra_binds: []
+    win_extra_env: []
   kubelet:
     image: ""
-    extra_args:
-      feature-gates: "RotateKubeletServerCertificate=true"
-      protect-kernel-defaults: "true"
-      tls-cipher-suites: "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256"
-    extra_binds: []
+    extra_args: {}
+    extra_binds:
+        - "/mnt/disks/ssd1:/mnt/disks/ssd1"
     extra_env: []
+    win_extra_args: {}
+    win_extra_binds: []
+    win_extra_env: []
     cluster_domain: cluster.local
     infra_container_image: ""
     cluster_dns_server: 10.43.0.10
     fail_swap_on: false
-    generate_serving_certificate: true
+    generate_serving_certificate: false
   kubeproxy:
     image: ""
     extra_args: {}
     extra_binds: []
     extra_env: []
-
-#########----- system images -----#########
-
-system_images: 
+    win_extra_args: {}
+    win_extra_binds: []
+    win_extra_env: []
+network:
+  plugin: canal
+  options: {}
+  mtu: 0
+  node_selector: {}
+  update_strategy: null
+authentication:
+  strategy: x509
+  sans: []
+  webhook: null
+addons: ""
+addons_include: []
+system_images:
   etcd: rancher/coreos-etcd:v3.4.13-rancher1
   alpine: rancher/rke-tools:v0.1.65
   nginx_proxy: rancher/rke-tools:v0.1.65
@@ -180,37 +167,31 @@ system_images:
   ingress_backend: rancher/nginx-ingress-controller-defaultbackend:1.5-rancher1
   metrics_server: rancher/metrics-server:v0.3.6
   windows_pod_infra_container: rancher/kubelet-pause:v0.1.4
-
-#########----- additional plugins -----#########
-
 ssh_key_path: ~/.ssh/id_rsa
 ssh_cert_path: ""
 ssh_agent_auth: false
-ingress:
-  provider: none
-monitoring:
-  provider: none
-network:
-  plugin: canal
-  options: {}
-  mtu: 0
-  node_selector: {}
-  update_strategy: # Available in v2.4
-    strategy: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 2
-authentication:
-  strategy: x509
-  sans: []
-  webhook: null
 authorization:
   mode: rbac
   options: {}
+ignore_docker_version: null
+kubernetes_version: ""
 private_registries: []
-  #- url: registry.com
-  #  user: Username
-  #  password: password
-  #  is_default: true
+ingress:
+  provider: ""
+  options: {}
+  node_selector: {}
+  extra_args: {}
+  dns_policy: ""
+  extra_envs: []
+  extra_volumes: []
+  extra_volume_mounts: []
+  update_strategy: null
+cluster_name: "kube"
+cloud_provider:
+  name: ""
+prefix_path: ""
+win_prefix_path: ""
+addon_job_timeout: 0
 bastion_host:
   address: ""
   port: ""
@@ -219,37 +200,13 @@ bastion_host:
   ssh_key_path: ""
   ssh_cert: ""
   ssh_cert_path: ""
+monitoring:
+  provider: ""
+  options: {}
+  node_selector: {}
+  update_strategy: null
+  replicas: null
 restore:
   restore: false
   snapshot_name: ""
-enable_cluster_alerting: false
-enable_cluster_monitoring: false
-windows_prefered_cluster: false
-
-#########----- cluster upgrades -----#########
-
-upgrade_strategy:
-  max_unavailable_worker: 20%
-  max_unavailable_controlplane: 1
-  drain: false
-  node_drain_input:
-    force: false
-    ignore_daemonsets: true
-    delete_local_data: false
-    grace_period: -1 # grace period specified for each pod spec will be used
-    timeout: 60
-
-#########----- defaults & add-ons -----#########
-
-ignore_docker_version: null
 dns: null
-docker_root_dir: /var/lib/docker
-addon_job_timeout: 30
-addons_include: []
-addons: |-
-  apiVersion: v1
-  kind: ServiceAccount
-  metadata:
-    name: default
-    namespace:default
-  automountServiceAccountToken: false

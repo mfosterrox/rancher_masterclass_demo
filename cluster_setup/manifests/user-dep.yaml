@@ -6,6 +6,9 @@ metadata:
   labels:
     name: user
   namespace: sock-shop
+  annotations:
+    #ignore-check.kube-linter.io/required-label-owner: "not necessary - demo purposes :)"
+    #kube-linter.io/ignore-all: true
 spec:
   replicas: 1
   selector:
