@@ -1,0 +1,21 @@
+# ignore .ds_store
+.DS_Store
+
+# ignore .terraform configuration
+**/.terraform/*
+
+# ignore all generated cluster files
+**/cluster
+
+# ignore all generated state files
+**/state
+
+# ignore all generated backup state files
+**/state_bak
+
+# ignore stackrox configuration files
+**/stackrox
+
+# ignore auth files
+/cluster_setup/files/auth.json
+/cluster_setup/files/id_rsa.pub
