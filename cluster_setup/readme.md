@@ -15,7 +15,7 @@
 
 ## Getting Started
 
-For now, only cluster in **GCP** can be created. Soon, **AWS** and **Azure** clusters will be available. The Kubernetes cluster is deployed using Ranchers RKE binary and is an up to date 1.19 cluster version. The deployment relies on GNU Make, Terraform, RKE and kubectl, as well as a valid GCP account.
+For now, only cluster in **GCP** can be created. The Kubernetes cluster is deployed using Ranchers RKE binary and is an up to date 1.19 cluster version. The deployment relies on GNU Make, Terraform, RKE and kubectl, as well as a valid GCP account.
 
 ### What You'll Need
 
@@ -36,19 +36,18 @@ The deployment is broken into two parts. The VM creation, then the cluster creat
 ```shell
 cluster_setup/
   └ Makefile
-  └ gcp
-    └ cluster/      (Cluster configs generated here) 
-    └ files/
-      └ cluster.yml
-      └ init.sh 
-      └ auth.json   (YOUR GCP AUTH FILE)
-      └ id_rsa.pub  (YOUR PUBLIC SSH KEY)
-    └ state/        (Terraform state files can be found here)
-    └ environment.tf
-    └ main.tf
-    └ network.tf
-    └ provider.tf
-    └ variables.tf
+  └ cluster/      (Cluster configs generated here) 
+  └ files/
+    └ cluster.yml
+    └ init.sh 
+    └ auth.json   (YOUR GCP AUTH FILE)
+    └ id_rsa.pub  (YOUR PUBLIC SSH KEY)
+  └ state/        (Terraform state files can be found here)
+  └ environment.tf
+  └ main.tf
+  └ network.tf
+  └ provider.tf
+  └ variables.tf
 ```
 
 ## GCP Setup
@@ -62,19 +61,23 @@ This will allow access to your gcp project and set your public key in the create
 ### The Make Commands
 The Makefile currently has 7 **WORKING** commands for the cluster setup:
 
-**gcp-init**: Initialize Terraform and import the providers
+**make init**: Initialize Terraform and import the providers
 
-**gcp-validate**: Validate the modules and .tf files
+**make validate**: Validate the modules and .tf files
 
-**gcp-plan**: equivalent to 'Terraform Plan' - will display the created resources
+**make plan**: equivalent to 'Terraform Plan' - will display the created resources
 
-**gcp-apply**: Will create the virtual machines for the cluster
+**make apply**: Will create the virtual machines for the cluster
 
-**gcp-rke-up**: Use **AFTER** the virtual machines have been created to bootstrap the cluster.
+**make rke-up**: Use **AFTER** the virtual machines have been created to bootstrap the cluster.
 
-**gcp-rke-remove**: Remove the k8s cluster
+**make kube-config**: move kube_config_config to ~/.kube/config 
 
-**gcp-destroy**: Destroy the VM resources (and save you money!!)
+**make sockshop**: Bring up the sockshop application
+
+**make rke-remove**: Remove the k8s cluster
+
+**make destroy**: Destroy the VM resources (and save you money!!)
 
 
 ## To Start
@@ -82,15 +85,15 @@ The Makefile currently has 7 **WORKING** commands for the cluster setup:
 Make sure that you have the necessary applications to run the commands and execute:
 
 ### To create the VM's
-`make gcp-init`
-`make gcp-plan`
-`make gcp-apply`
+`make make init`
+`make make plan`
+`make make apply`
 
 ### To create the Cluster
-`make gcp-rke-up`
+`make make rke-up`
 
 ### Outputs
 
-1. The state files will be written to `rancher_masterclass_demo/state/*` after running `gcp-apply`.
+1. The state files will be written to `rancher_masterclass_demo/state/*` after running `make apply`.
 2. The kubeconfig file be output to `rancher_masterclass_demo/cluster/kube_config.yml`
 3. You will need to make to output `kube_config file` your new `rancher_masterclass_demo/.kube/config` file

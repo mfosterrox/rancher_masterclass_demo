@@ -1,5 +1,5 @@
 checks:
-  # addAllBuiltIn: true
+  addAllBuiltIn: true
   # doNotAutoAddDefaults: true
   # include:
   # - dangling-service
@@ -21,7 +21,7 @@ checks:
   # - unset-cpu-requirements
   # - unset-memory-requirements
   # - writable-host-mount
-  # exclude:
+  exclude:
   # - dangling-service
   # - default-service-account
   # - deprecated-service-account-field
@@ -34,7 +34,7 @@ checks:
   # - no-readiness-probe
   # - non-existent-service-account
   # - privileged-container
-  # - required-annotation-email
+  # - required-annotation-email 
   # - required-label-owner
   # - run-as-non-root
   # - ssh-port
@@ -42,19 +42,19 @@ checks:
   # - unset-memory-requirements
   # - writable-host-mount
 customChecks:
-  # - name: required-annotation-responsible
-  #   template: required-annotation
-  #   params:
-  #     key: rancher/masterclass
-  #   remediation: set the demo field please :)
-  # - name: required-label-release
-  #   template: required-label
-  #   params:
-  #     key: team
-  #   remediation: set the team field please :)
-  #   scope:
-  #     objectKinds:
-  #       - Service
+  - name: required-annotation-responsible
+    template: required-annotation
+    params:
+      key: rancher/masterclass
+    remediation: set the demo field please :)
+  - name: required-label-release
+    template: required-label
+    params:
+      key: team
+    remediation: set the team field please :)
+    scope:
+      objectKinds:
+        - Service
   # - name: deployment-ports-list
   #   template: ports
   #   params:
